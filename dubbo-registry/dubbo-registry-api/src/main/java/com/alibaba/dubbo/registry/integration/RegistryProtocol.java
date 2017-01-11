@@ -102,18 +102,23 @@ public class RegistryProtocol implements Protocol {
     
     private final static Logger logger = LoggerFactory.getLogger(RegistryProtocol.class);
     
+    /**
+     * 主要做两件事情：1、开启netty服务端  。2、创建zookeeper服务节点
+     */
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
-        //export invoker
+        //export invoker  doLocalExport调用dubboProtocol.export开启netty服务监听  
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker);
         //registry provider
         final Registry registry = getRegistry(originInvoker);
         final URL registedProviderUrl = getRegistedProviderUrl(originInvoker);
+        // 调用zodoRegister的doRegister 创建zookeeper的服务节点
         registry.register(registedProviderUrl);
         // 订阅override数据
         // FIXME 提供者订阅时，会影响同一JVM即暴露服务，又引用同一服务的的场景，因为subscribed以服务名为缓存的key，导致订阅信息覆盖。
         final URL overrideSubscribeUrl = getSubscribedOverrideUrl(registedProviderUrl);
         final OverrideListener overrideSubscribeListener = new OverrideListener(overrideSubscribeUrl);
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
+        //订阅
         registry.subscribe(overrideSubscribeUrl, overrideSubscribeListener);
         //保证每次export都返回一个新的exporter实例
         return new Exporter<T>() {
@@ -150,6 +155,8 @@ public class RegistryProtocol implements Protocol {
                 exporter = (ExporterChangeableWrapper<T>) bounds.get(key);
                 if (exporter == null) {
                     final Invoker<?> invokerDelegete = new InvokerDelegete<T>(originInvoker, getProviderUrl(originInvoker));
+                    //此处protol为dubboProtocol 
+                    // dubboProtocol的export对服务进行暴露，这个export最终目的就是开启netty的监听
                     exporter = new ExporterChangeableWrapper<T>((Exporter<T>)protocol.export(invokerDelegete), originInvoker);
                     bounds.put(key, exporter);
                 }

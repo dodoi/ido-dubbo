@@ -45,7 +45,7 @@ import com.alibaba.dubbo.remoting.transport.dispatcher.ChannelHandlers;
 
 /**
  * NettyServer
- * 
+ * dubbo在暴露服务最终开启的netty服务监听，监听消费者发送的请求，通过反射调用方法得到结果通过 tcp/ip 网络传输返回给消费者
  * @author qian.lei
  * @author chao.liuc
  */
@@ -68,7 +68,9 @@ public class NettyServer extends AbstractServer implements Server {
         NettyHelper.setNettyLoggerFactory();
         ExecutorService boss = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerBoss", true));
         ExecutorService worker = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerWorker", true));
+        //最后一个参数为 NIO 最大工作线程数  
         ChannelFactory channelFactory = new NioServerSocketChannelFactory(boss, worker, getUrl().getPositiveParameter(Constants.IO_THREADS_KEY, Constants.DEFAULT_IO_THREADS));
+      //netty server 启动器  
         bootstrap = new ServerBootstrap(channelFactory);
         
         final NettyHandler nettyHandler = new NettyHandler(getUrl(), this);
@@ -90,7 +92,7 @@ public class NettyServer extends AbstractServer implements Server {
                 return pipeline;
             }
         });
-        // bind
+        // bind ; 创建一个绑定到指定地址的新通道，也就是绑定IP、端口供客户端连接  
         channel = bootstrap.bind(getBindAddress());
     }
 

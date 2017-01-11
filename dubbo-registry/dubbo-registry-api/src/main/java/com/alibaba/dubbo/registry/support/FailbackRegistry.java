@@ -120,6 +120,9 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         }
     }
 
+    /**
+     * dubbo服务在zookeeper上的节点注册
+     */
     @Override
     public void register(URL url) {
         super.register(url);

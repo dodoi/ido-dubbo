@@ -122,7 +122,9 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
 
     @SuppressWarnings({ "unchecked", "deprecation" })
 	public void afterPropertiesSet() throws Exception {
+        //如果没有配置provider 
         if (getProvider() == null) {
+            //获取IOC容器里的所有provider  
             Map<String, ProviderConfig> providerConfigMap = applicationContext == null ? null  : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ProviderConfig.class, false, false);
             if (providerConfigMap != null && providerConfigMap.size() > 0) {
                 Map<String, ProtocolConfig> protocolConfigMap = applicationContext == null ? null  : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ProtocolConfig.class, false, false);
@@ -134,6 +136,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                             providerConfigs.add(config);
                         }
                     }
+                    //关联所有providers  
                     if (providerConfigs.size() > 0) {
                         setProviders(providerConfigs);
                     }
@@ -153,8 +156,10 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                 }
             }
         }
+        //如果没有配置application，且没有配置provider  
         if (getApplication() == null
                 && (getProvider() == null || getProvider().getApplication() == null)) {
+            //获取所有applications  
             Map<String, ApplicationConfig> applicationConfigMap = applicationContext == null ? null : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ApplicationConfig.class, false, false);
             if (applicationConfigMap != null && applicationConfigMap.size() > 0) {
                 ApplicationConfig applicationConfig = null;
@@ -166,11 +171,13 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                         applicationConfig = config;
                     }
                 }
+                //关联application  
                 if (applicationConfig != null) {
                     setApplication(applicationConfig);
                 }
             }
         }
+        //如果没有配置module，且没有配置provider  
         if (getModule() == null
                 && (getProvider() == null || getProvider().getModule() == null)) {
             Map<String, ModuleConfig> moduleConfigMap = applicationContext == null ? null : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ModuleConfig.class, false, false);
@@ -184,11 +191,13 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                         moduleConfig = config;
                     }
                 }
+                //关联module
                 if (moduleConfig != null) {
                     setModule(moduleConfig);
                 }
             }
         }
+        //如果没有配置registries，且没有配置provider 
         if ((getRegistries() == null || getRegistries().size() == 0)
                 && (getProvider() == null || getProvider().getRegistries() == null || getProvider().getRegistries().size() == 0)
                 && (getApplication() == null || getApplication().getRegistries() == null || getApplication().getRegistries().size() == 0)) {
@@ -200,11 +209,13 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                         registryConfigs.add(config);
                     }
                 }
+                //关联registries 
                 if (registryConfigs != null && registryConfigs.size() > 0) {
                     super.setRegistries(registryConfigs);
                 }
             }
         }
+        //如果没有配置monitor，且没有配置provider  
         if (getMonitor() == null
                 && (getProvider() == null || getProvider().getMonitor() == null)
                 && (getApplication() == null || getApplication().getMonitor() == null)) {
@@ -219,11 +230,13 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                         monitorConfig = config;
                     }
                 }
+                //关联monitor  
                 if (monitorConfig != null) {
                     setMonitor(monitorConfig);
                 }
             }
         }
+        //如果没有配置protocol，且没有配置provider  
         if ((getProtocols() == null || getProtocols().size() == 0)
                 && (getProvider() == null || getProvider().getProtocols() == null || getProvider().getProtocols().size() == 0)) {
             Map<String, ProtocolConfig> protocolConfigMap = applicationContext == null ? null  : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ProtocolConfig.class, false, false);
@@ -234,11 +247,13 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                         protocolConfigs.add(config);
                     }
                 }
+                //关联protocol  
                 if (protocolConfigs != null && protocolConfigs.size() > 0) {
                     super.setProtocols(protocolConfigs);
                 }
             }
         }
+        //如果没有配置path
         if (getPath() == null || getPath().length() == 0) {
             if (beanName != null && beanName.length() > 0 
                     && getInterface() != null && getInterface().length() > 0
@@ -246,6 +261,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                 setPath(beanName);
             }
         }
+        //暴露provider  
         if (! isDelay()) {
             export();
         }

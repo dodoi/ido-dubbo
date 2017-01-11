@@ -154,7 +154,12 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             }
         }
     }
-    
+    /**
+     * checkRegistry如果xml中没有配置注册中，从dubbo.properties中读取配置，构建RegistryConfig对象并赋值
+     * 构建注册中心URL统一数据模式集合List<registryUrl>
+     * @param provider
+     * @return
+     */
     protected List<URL> loadRegistries(boolean provider) {
         checkRegistry();
         List<URL> registryList = new ArrayList<URL>();

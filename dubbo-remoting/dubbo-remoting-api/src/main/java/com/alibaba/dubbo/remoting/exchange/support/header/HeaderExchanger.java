@@ -38,6 +38,7 @@ public class HeaderExchanger implements Exchanger {
     }
 
     public ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {
+        //Transporters默认为NettyTransporter 
         return new HeaderExchangeServer(Transporters.bind(url, new DecodeHandler(new HeaderExchangeHandler(handler))));
     }
 
